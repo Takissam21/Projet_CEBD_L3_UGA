@@ -91,6 +91,85 @@ def insertDB():
              "insert into Mesures values (?, ?, ?, ?, ?)",
              ['code_insee_departement', 'date_obs', 'tmin', 'tmax', 'tmoy']
         )
+        # On ajoute les communes
+        read_csv_file(
+            "data/csv/Communes.csv", ';',
+            """
+            insert into Communes 
+            (code_departement , code_commune, nom_commune, status, altitude_moyenne, population, superficie, 
+             code_canton, code_arrondissement) 
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                'Code Département' , 'Code Commune', 'Commune', 'Statut', 'Altitude Moyenne', 'Population',
+                'Superficie', 'Code Canton', 'Code Arrondissement'
+            ]
+
+        )
+        # On ajoute isolation
+        read_csv_file(
+            "data/csv/Isolation.csv", ';',
+            """
+            insert into Isolation 
+            (cout_total_ht, cout_induit_ht, annee_travaux,  
+             code_region, code_departement,  
+             type_logement, annee_construction, poste_isolation, 
+             isolant, epaisseur, surface) 
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                'cout_total_ht', 'cout_induit_ht', 'annee_travaux',
+                'code_region', 'code_departement',
+                'type_logement', 'annee_construction', 'poste_isolation',
+                'isolant', 'epaisseur', 'surface'
+            ]
+        )
+
+        # On ajoute chauffage
+        read_csv_file(
+            "data/csv/Chauffage.csv", ';',
+            """
+            insert into Chauffage 
+            (cout_total_ht, cout_induit_ht, annee_travaux,  
+             code_region, code_departement,  
+             type_logement, annee_construction, energie_chauffage_avt_travaux, 
+             energie_chauffage_installee, generateur, type_chaudiere) 
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                'cout_total_ht', 'cout_induit_ht', 'annee_travaux',
+                'code_region', 'code_departement',
+                'type_logement', 'annee_construction', 'energie_chauffage_avt_travaux',
+                'energie_chauffage_installee', 'generateur', 'type_chaudiere'
+            ]
+        )
+        # On ajoute photovoltaique
+        read_csv_file(
+            "data/csv/Photovoltaique.csv", ';',
+            """
+            insert into Photovoltaique 
+            (cout_total_ht, cout_induit_ht, annee_travaux,  
+             code_region, code_departement,  
+             type_logement, annee_construction, puissance_installee, 
+             type_panneaux) 
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                'cout_total_ht', 'cout_induit_ht', 'annee_travaux',
+                'code_region', 'code_departement',
+                'type_logement', 'annee_construction', 'puissance_installee',
+                'type_panneaux'
+            ]
+        )
+
+        # On modifie les codes région des départements pour les codes des nouvelles régions
+        read_csv_file(
+            "data/csv/AnciennesNouvellesRegions.csv", ';',
+            "update Photovoltaique set code_region = ? where code_region = ?",
+            ['Nouveau Code', 'Anciens Code']
+        )
+
+
 
     except Exception as e:
         print ("L'erreur suivante s'est produite lors de l'insertion des données : " + repr(e) + ".")
