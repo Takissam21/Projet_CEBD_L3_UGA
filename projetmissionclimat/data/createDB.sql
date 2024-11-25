@@ -5,16 +5,17 @@ create table Regions (
 );
 
 create table Departements (
-    code_departement TEXT,
+    code_departement INTEGER,
     nom_departement TEXT,
     code_region INTEGER,
     zone_climatique TEXT,
     constraint pk_departements primary key (code_departement),
-    constraint fk_region foreign key (code_region) references Regions(code_region)
+    constraint fk_region foreign key (code_region) references Regions(code_region),
+    constraint zone_climatique_valide CHECK (zone_climatique IN ('H1', 'H2', 'H3'))
 );
 
 create table Mesures (
-    code_departement TEXT,
+    code_departement INTEGER,
     date_mesure DATE,
     temperature_min_mesure FLOAT,
     temperature_max_mesure FLOAT,
@@ -35,7 +36,7 @@ create table Communes (
     code_canton INTEGER,
     code_arrondissement INTEGER,
 
-    code_departement TEXT,
+    code_departement INTEGER,
 
     constraint pk_commune primary key (code_commune,code_departement),
     constraint fk_commune foreign key (code_departement) references Departements(code_departement)
@@ -53,11 +54,16 @@ CREATE TABLE Isolation (
     epaisseur INTEGER,
     surface FLOAT,
 
-    code_departement TEXT,             -- Code du département (clé étrangère)
+    code_departement INTEGER,             -- Code du département (clé étrangère)
     code_region INTEGER,                  -- Code de la région (clé étrangère)
 
     FOREIGN KEY (code_region) REFERENCES Regions(code_region),
-    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement)
+    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement),
+    CONSTRAINT type_poste_valide CHECK (poste_isolation IN (
+        'COMBLES PERDUES', 'ITI', 'ITE', 'RAMPANTS',
+        'SARKING', 'TOITURE TERRASSE', 'PLANCHER BAS')),
+    CONSTRAINT type_isolant_valide CHECK (isolant IN (
+        'AUTRES','LAINE VEGETALE','LAINE MINERALE','PLASTIQUES'))
 );
 
 CREATE TABLE Chauffage (
@@ -73,11 +79,31 @@ CREATE TABLE Chauffage (
     generateur TEXT,
     type_chaudiere TEXT,
 
-    code_departement TEXT,             -- Code du département (clé étrangère)
+    code_departement INTEGER,             -- Code du département (clé étrangère)
     code_region INTEGER,                  -- Code de la région (clé étrangère)
 
     FOREIGN KEY (code_region) REFERENCES Regions(code_region),
-    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement)
+
+    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement),
+
+    CONSTRAINT type_energie_valide CHECK (energie_chauffage_avt_travaux IN (
+        'AUTRES', 'BOIS', 'ELECTRICITE', 'FIOUL', 'GAZ')),
+
+    CONSTRAINT type_energie_validee CHECK (energie_chauffage_installee IN (
+        'AUTRES', 'BOIS', 'ELECTRICITE', 'FIOUL', 'GAZ')),
+
+    CONSTRAINT type_generateur_valide CHECK (generateur IN (
+        'AUTRES', 'CHAUDIERE', 'INSERT', 'PAC', 'POELE', 'RADIATEUR')),
+
+    CONSTRAINT type_chaudiere_valide CHECK (type_chaudiere IN (
+        'STANDARD',
+        'AIR-EAU',
+        'A CONDENSATION',
+        'AUTRES',
+        'AIR-AIR',
+        'GEOTHERMIE',
+        'HPE'
+    ))
 );
 
 CREATE TABLE Photovoltaique (
@@ -95,5 +121,10 @@ CREATE TABLE Photovoltaique (
     code_region INTEGER,                  -- Code de la région (clé étrangère)
 
     FOREIGN KEY (code_region) REFERENCES Regions(code_region),
-    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement)
+    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement),
+
+    CONSTRAINT type_panneaux_valide CHECK (type_panneaux IN (
+        'MONOCRISTALLIN',
+        'POLYCRISTALLIN'
+    ))
 );

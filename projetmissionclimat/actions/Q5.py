@@ -48,52 +48,29 @@ class Window(tk.Toplevel):
         # On démarre le chrono et initialise à 0 le nombre de requêtes exécutées
         start = time.time()
         nbquery = 0
-
-        # On récupère les départements
-        tab = []
+        # 1. Requête
+        query = """
+              SELECT D.code_departement, D.nom_departement, 
+                     strftime('%Y', M.date_mesure) AS annee,
+                     ROUND(AVG(M.temperature_moy_mesure), 2) AS moyenne,
+                     MIN(M.temperature_min_mesure) AS minimum,
+                     MAX(M.temperature_max_mesure) AS maximum
+              FROM Departements D
+              LEFT JOIN Mesures M ON D.code_departement = M.code_departement
+              GROUP BY D.code_departement, annee
+              ORDER BY D.code_departement, annee
+          """
         try:
-            query = """
-                SELECT code_departement, nom_departement
-                FROM Departements
-                ORDER BY code_departement
-            """
             cursor = db.data.cursor()
             result = cursor.execute(query)
-            nbquery += 1
+            nbquery += 1  # Une seule requête pour récupérer toutes les données
         except Exception as e:
             print("Erreur : " + repr(e))
         else:
-            # Pour chaque département...
-            for dept in result:
-                # On récupère les années où il y a des mesures pour ce département
-                try:
-                    cursor2 = db.data.cursor()
-                    result2 = cursor2.execute("""
-                        SELECT DISTINCT strftime('%Y', date_mesure) as annee
-                        FROM Mesures
-                        WHERE Mesures.code_departement = ?
-                    """, [dept[0]])
-                    nbquery += 1
-                except Exception as e:
-                    print("Erreur : " + repr(e))
-                else:
-                    # Pour chaque année...
-                    for annee in result2:
-                        # On récupère les mesures pour ce département et cette année
-                        try:
-                            cursor3 = db.data.cursor()
-                            result3 = cursor3.execute("""
-                            SELECT ROUND(avg(temperature_moy_mesure), 2) AS moyenne, min(temperature_min_mesure) AS minimum, max(temperature_max_mesure) AS maximum
-                            FROM Mesures
-                            WHERE Mesures.code_departement = ? AND strftime('%Y', date_mesure) = ?
-                            """, [dept[0], annee[0]])
-                            nbquery += 1
-                        except Exception as e:
-                            print("Erreur : " + repr(e))
-                        else:
-                            # On ajoute notre mesure dans le tableau
-                            for mesures in result3:
-                                tab.append([dept[0], dept[1], annee[0], mesures[0], mesures[1], mesures[2]])
+            tab = []
+            # 2. Traitement des résultats pour afficher dans la treeview
+            for row in result:
+                tab.append([row[0], row[1], row[2], row[3], row[4], row[5]])
 
         # On affiche les données du tableau dans la treeview
         for row in tab:

@@ -124,6 +124,12 @@ def insertDB():
                 'isolant', 'epaisseur', 'surface'
             ]
         )
+        # On modifie les codes région des départements pour les codes des nouvelles régions
+        read_csv_file(
+            "data/csv/AnciennesNouvellesRegions.csv", ';',
+            "update Isolation set code_region = ? where code_region = ?",
+            ['Nouveau Code', 'Anciens Code']
+        )
 
         # On ajoute chauffage
         read_csv_file(
@@ -143,6 +149,11 @@ def insertDB():
                 'energie_chauffage_installee', 'generateur', 'type_chaudiere'
             ]
         )
+        read_csv_file(
+            "data/csv/AnciennesNouvellesRegions.csv", ';',
+            "update Chauffage set code_region = ? where code_region = ?",
+            ['Nouveau Code', 'Anciens Code']
+        )
         # On ajoute photovoltaique
         read_csv_file(
             "data/csv/Photovoltaique.csv", ';',
@@ -161,14 +172,14 @@ def insertDB():
                 'type_panneaux'
             ]
         )
-        """
+
         # On modifie les codes région des Photovoltaique pour les codes des nouvelles régions
         read_csv_file(
             "data/csv/AnciennesNouvellesRegions.csv", ';',
             "update Photovoltaique set code_region = ? where code_region = ?",
             ['Nouveau Code', 'Anciens Code']
         )        
-        """
+
 
 
 
