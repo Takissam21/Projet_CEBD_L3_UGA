@@ -21,7 +21,7 @@ create table Mesures (
     temperature_max_mesure FLOAT,
     temperature_moy_mesure FLOAT,
     constraint pk_mesures primary key (code_departement, date_mesure),
-    constraint fk_mesures foreign key (code_departement) references Departements(code_departement)
+    constraint fk_mesures foreign key (code_departement) references Departements(code_departement) ON DELETE CASCADE
 );
 
 --TODO Q4 Ajouter les créations des nouvelles tables
@@ -39,7 +39,7 @@ create table Communes (
     code_departement INTEGER,
 
     constraint pk_commune primary key (code_commune,code_departement),
-    constraint fk_commune foreign key (code_departement) references Departements(code_departement)
+    constraint fk_commune foreign key (code_departement) references Departements(code_departement) ON DELETE CASCADE
 );
 
 CREATE TABLE Isolation (
