@@ -91,7 +91,7 @@ CREATE TABLE Photovoltaique (
     puissance_installee TEXT,
     type_panneaux TEXT ,
 
-    code_departement TEXT,             -- Code du département (clé étrangère)
+    code_departement INTEGER,             -- Code du département (clé étrangère)
     code_region INTEGER,                  -- Code de la région (clé étrangère)
 
     FOREIGN KEY (code_region) REFERENCES Regions(code_region),

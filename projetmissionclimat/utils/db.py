@@ -149,7 +149,7 @@ def insertDB():
             """
             insert into Photovoltaique 
             (cout_total_ht, cout_induit_ht, annee_travaux,  
-             code_region, code_departement,  
+             code_region, code_departement  ,  
              type_logement, annee_construction, puissance_installee, 
              type_panneaux) 
             values (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -161,13 +161,15 @@ def insertDB():
                 'type_panneaux'
             ]
         )
-
-        # On modifie les codes région des départements pour les codes des nouvelles régions
+        """
+        # On modifie les codes région des Photovoltaique pour les codes des nouvelles régions
         read_csv_file(
             "data/csv/AnciennesNouvellesRegions.csv", ';',
             "update Photovoltaique set code_region = ? where code_region = ?",
             ['Nouveau Code', 'Anciens Code']
-        )
+        )        
+        """
+
 
 
 
