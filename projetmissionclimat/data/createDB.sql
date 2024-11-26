@@ -5,7 +5,7 @@ create table Regions (
 );
 
 create table Departements (
-    code_departement INTEGER,
+    code_departement TEXT,
     nom_departement TEXT,
     code_region INTEGER,
     zone_climatique TEXT,
@@ -15,7 +15,7 @@ create table Departements (
 );
 
 create table Mesures (
-    code_departement INTEGER,
+    code_departement TEXT,
     date_mesure DATE,
     temperature_min_mesure FLOAT,
     temperature_max_mesure FLOAT,
@@ -36,95 +36,55 @@ create table Communes (
     code_canton INTEGER,
     code_arrondissement INTEGER,
 
-    code_departement INTEGER,
+    code_departement TEXT,
 
     constraint pk_commune primary key (code_commune,code_departement),
     constraint fk_commune foreign key (code_departement) references Departements(code_departement) ON DELETE CASCADE
 );
 
-CREATE TABLE Isolation (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, -- ID auto-incrémenté
-    cout_total_ht FLOAT,
-    cout_induit_ht FLOAT,
-    annee_travaux INTEGER,
-    type_logement TEXT,
-    annee_construction INTEGER,
-    poste_isolation TEXT, --Type
-    isolant TEXT, --Type
-    epaisseur INTEGER,
-    surface FLOAT,
+create table Travaux (
+    id_travaux INTEGER,
+    cout_total_ht_travaux FLOAT,
+    cout_induit_ht_travaux FLOAT,
+    date_travaux DATE,
+    type_logement_travaux TEXT,
+    annee_construction_logement_travaux TEXT,
+    code_region INTEGER,
+    code_departement TEXT,
 
-    code_departement INTEGER,             -- Code du département (clé étrangère)
-    code_region INTEGER,                  -- Code de la région (clé étrangère)
-
-    FOREIGN KEY (code_region) REFERENCES Regions(code_region),
-    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement),
-    CONSTRAINT type_poste_valide CHECK (poste_isolation IN (
-        'COMBLES PERDUES', 'ITI', 'ITE', 'RAMPANTS',
-        'SARKING', 'TOITURE TERRASSE', 'PLANCHER BAS')),
-    CONSTRAINT type_isolant_valide CHECK (isolant IN (
-        'AUTRES','LAINE VEGETALE','LAINE MINERALE','PLASTIQUES'))
+    constraint pk_travaux primary key (id_travaux),
+    constraint fk_travaux2 foreign key (code_departement)REFERENCES Departements(code_departement),
+    constraint fk_travaux foreign key (code_region) References Regions(code_region)
 );
 
-CREATE TABLE Chauffage (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, -- ID auto-incrémenté
-    cout_total_ht FLOAT,
-    cout_induit_ht FLOAT,
-    annee_travaux INTEGER,
-    type_logement TEXT,
-    annee_construction INTEGER,
-
-    energie_chauffage_avt_travaux TEXT,
-    energie_chauffage_installee TEXT ,
-    generateur TEXT,
-    type_chaudiere TEXT,
-
-    code_departement INTEGER,             -- Code du département (clé étrangère)
-    code_region INTEGER,                  -- Code de la région (clé étrangère)
-
-    FOREIGN KEY (code_region) REFERENCES Regions(code_region),
-
-    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement),
-
-    CONSTRAINT type_energie_valide CHECK (energie_chauffage_avt_travaux IN (
-        'AUTRES', 'BOIS', 'ELECTRICITE', 'FIOUL', 'GAZ')),
-
-    CONSTRAINT type_energie_validee CHECK (energie_chauffage_installee IN (
-        'AUTRES', 'BOIS', 'ELECTRICITE', 'FIOUL', 'GAZ')),
-
-    CONSTRAINT type_generateur_valide CHECK (generateur IN (
-        'AUTRES', 'CHAUDIERE', 'INSERT', 'PAC', 'POELE', 'RADIATEUR')),
-
-    CONSTRAINT type_chaudiere_valide CHECK (type_chaudiere IN (
-        'STANDARD',
-        'AIR-EAU',
-        'A CONDENSATION',
-        'AUTRES',
-        'AIR-AIR',
-        'GEOTHERMIE',
-        'HPE'
-    ))
+create table Isolations (
+    id_travaux INTEGER PRIMARY KEY AUTOINCREMENT,
+    poste_isolation TEXT,
+    isolant_isolation TEXT,
+    epaisseur_isolation INTEGER,
+    surface_isolation FLOAT,
+    constraint fk_isolation foreign key (id_travaux) references Travaux(id_travaux) ON DELETE CASCADE,
+    constraint ck_poste check (poste_isolation in ('COMBLES PERDUES', 'ITI', 'ITE', 'RAMPANTS', 'SARKING', 'TOITURE TERRASSE', 'PLANCHER BAS')),
+    constraint ck_isolant check (isolant_isolation in ('AUTRES', 'LAINE VEGETALE', 'LAINE MINERALE', 'PLASTIQUES'))
 );
 
-CREATE TABLE Photovoltaique (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, -- ID auto-incrémenté
-    cout_total_ht FLOAT,
-    cout_induit_ht FLOAT,
-    annee_travaux INTEGER,
-    type_logement TEXT,
-    annee_construction INTEGER,
+create table Chauffages (
+    id_travaux INTEGER PRIMARY KEY AUTOINCREMENT,
+    energie_avt_travaux_chauffage TEXT,
+    energie_installee_chauffage TEXT,
+    generateur_chauffage TEXT,
+    type_chaudiere_chauffage TEXT,
+    constraint fk_chauffages foreign key (id_travaux) references Travaux(id_travaux) ON DELETE CASCADE,
+    constraint ck_energieavt_chauffage check (energie_avt_travaux_chauffage in ('AUTRES', 'BOIS', 'ELECTRICITE', 'FIOUL', 'GAZ')),
+    constraint ck_energieinst_chauffage check (energie_installee_chauffage in ('AUTRES', 'BOIS', 'ELECTRICITE', 'FIOUL', 'GAZ')),
+    constraint ck_generateur_chauffage check (generateur_chauffage in ('AUTRES', 'CHAUDIERE', 'INSERT', 'PAC', 'POELE', 'RADIATEUR')),
+    constraint ck_chaudiere_chauffage check (type_chaudiere_chauffage in ('STANDARD', 'AIR-EAU', 'A CONDENSATION', 'AUTRES', 'AIR-AIR', 'GEOTHERME', 'HPE'))
+);
 
-    puissance_installee TEXT,
-    type_panneaux TEXT ,
-
-    code_departement INTEGER,             -- Code du département (clé étrangère)
-    code_region INTEGER,                  -- Code de la région (clé étrangère)
-
-    FOREIGN KEY (code_region) REFERENCES Regions(code_region),
-    FOREIGN KEY (code_departement) REFERENCES Departements(code_departement),
-
-    CONSTRAINT type_panneaux_valide CHECK (type_panneaux IN (
-        'MONOCRISTALLIN',
-        'POLYCRISTALLIN'
-    ))
+create table Photovoltaiques (
+    id_travaux INTEGER PRIMARY KEY AUTOINCREMENT,
+    puissance_installee_photovoltaique INTEGER,
+    type_panneaux_photovoltaique TEXT,
+    constraint fk_photovoltaiques foreign key (id_travaux) references Travaux(id_travaux) ON DELETE CASCADE,
+    constraint ck_photovoltaiques check (type_panneaux_photovoltaique in ('MONOCRISTALLIN', 'POLYCRISTALLIN'))
 );

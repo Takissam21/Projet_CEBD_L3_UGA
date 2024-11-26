@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 from sqlite3 import IntegrityError
 import pandas
 
@@ -106,82 +107,41 @@ def insertDB():
             ]
 
         )
-        # On ajoute isolation
-        read_csv_file(
+        # On ajoute les travaux d'isolation dans les tables Travaux et Isolations
+        read_csv_file_travaux(
             "data/csv/Isolation.csv", ';',
-            """
-            insert into Isolation 
-            (cout_total_ht, cout_induit_ht, annee_travaux,  
-             code_region, code_departement,  
-             type_logement, annee_construction, poste_isolation, 
-             isolant, epaisseur, surface) 
-            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            [
-                'cout_total_ht', 'cout_induit_ht', 'annee_travaux',
-                'code_region', 'code_departement',
-                'type_logement', 'annee_construction', 'poste_isolation',
-                'isolant', 'epaisseur', 'surface'
-            ]
-        )
-        # On modifie les codes région des départements pour les codes des nouvelles régions
-        read_csv_file(
-            "data/csv/AnciennesNouvellesRegions.csv", ';',
-            "update Isolation set code_region = ? where code_region = ?",
-            ['Nouveau Code', 'Anciens Code']
+            "insert into Travaux (cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, type_logement_travaux, annee_construction_logement_travaux, code_region,code_departement) values (?, ?, ?, ?, ?, ?,?)",
+            "insert into Isolations values (?, ?, ?, ?, ?)",
+            ['cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement', 'annee_construction', 'code_region','code_departement'],
+            ['poste_isolation', 'isolant', 'epaisseur', 'surface']
         )
 
-        # On ajoute chauffage
-        read_csv_file(
+        # On ajoute les travaux de chauffage dans les tables Travaux et Chauffages
+        read_csv_file_travaux(
             "data/csv/Chauffage.csv", ';',
-            """
-            insert into Chauffage 
-            (cout_total_ht, cout_induit_ht, annee_travaux,  
-             code_region, code_departement,  
-             type_logement, annee_construction, energie_chauffage_avt_travaux, 
-             energie_chauffage_installee, generateur, type_chaudiere) 
-            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            [
-                'cout_total_ht', 'cout_induit_ht', 'annee_travaux',
-                'code_region', 'code_departement',
-                'type_logement', 'annee_construction', 'energie_chauffage_avt_travaux',
-                'energie_chauffage_installee', 'generateur', 'type_chaudiere'
-            ]
-        )
-        read_csv_file(
-            "data/csv/AnciennesNouvellesRegions.csv", ';',
-            "update Chauffage set code_region = ? where code_region = ?",
-            ['Nouveau Code', 'Anciens Code']
-        )
-        # On ajoute photovoltaique
-        read_csv_file(
-            "data/csv/Photovoltaique.csv", ';',
-            """
-            insert into Photovoltaique 
-            (cout_total_ht, cout_induit_ht, annee_travaux,  
-             code_region, code_departement  ,  
-             type_logement, annee_construction, puissance_installee, 
-             type_panneaux) 
-            values (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            [
-                'cout_total_ht', 'cout_induit_ht', 'annee_travaux',
-                'code_region', 'code_departement',
-                'type_logement', 'annee_construction', 'puissance_installee',
-                'type_panneaux'
-            ]
+            "insert into Travaux (cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, type_logement_travaux, annee_construction_logement_travaux, code_region,code_departement) values (?, ?, ?, ?, ?, ?,?)",
+            "insert into Chauffages values (?, ?, ?, ?, ?)",
+            ['cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement', 'annee_construction', 'code_region','code_departement'],
+            ['energie_chauffage_avt_travaux', 'energie_chauffage_installee', 'generateur', 'type_chaudiere']
         )
 
-        # On modifie les codes région des Photovoltaique pour les codes des nouvelles régions
+        # On ajoute les travaux de panneaux photovolatiques dans les tables Travaux et Photovoltaiques
+        read_csv_file_travaux(
+            "data/csv/Photovoltaique.csv", ';',
+            "insert into Travaux (cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, type_logement_travaux, annee_construction_logement_travaux, code_region,code_departement) values (?, ?, ?, ?, ?, ?,?)",
+            "insert into Photovoltaiques values (?, ?, ?)",
+            ['cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement', 'annee_construction', 'code_region','code_departement'],
+            ['puissance_installee', 'type_panneaux']
+        )
+
+        # On modifie les codes région des départements pour les codes des nouvelles régions
+        """
         read_csv_file(
             "data/csv/AnciennesNouvellesRegions.csv", ';',
-            "update Photovoltaique set code_region = ? where code_region = ?",
+            "update Travaux set code_region = ? where code_region = ?",
             ['Nouveau Code', 'Anciens Code']
         )        
-
-
-
+        """
 
 
     except Exception as e:
@@ -201,8 +161,7 @@ def deleteDB():
         print("La base de données a été supprimée avec succès.")
 
 def read_csv_file(csvFile, separator, query, columns):
-    # Lecture du fichier CSV csvFile avec le séparateur separator
-    # pour chaque ligne, exécution de query en la formatant avec les colonnes columns
+
     df = pandas.read_csv(csvFile, sep=separator)
     df = df.where(pandas.notnull(df), None)
 
@@ -221,3 +180,47 @@ def read_csv_file(csvFile, separator, query, columns):
         except IntegrityError as err:
             print(err)
 
+
+
+def read_csv_file_travaux(csvFile, separator, query_travaux, query_type, columns_travaux, columns_type):
+
+    df = pandas.read_csv(csvFile, sep=separator)
+    df = df.where(pandas.notnull(df), None)
+
+    cursor = data.cursor()
+
+    for ix, row in df.iterrows():
+        try:
+            tab_travaux = []
+            tab_type = []
+
+            for i in range(len(columns_travaux)):
+                if isinstance(row[columns_travaux[i]], str):
+                    row[columns_travaux[i]] = row[columns_travaux[i]].replace("'", "''")
+                if columns_travaux == 'date_x':
+                    date = row[columns_travaux[i]]
+                    if date.lower() != 'null':
+                        tabl = date.split('/')
+                        tab_travaux.append(datetime(int(tabl[2]), int(tabl[1]), int(tabl[0])).strftime("%Y-%m-%d"))
+                    else:
+                        tab_travaux.append('')
+                else:
+                    tab_travaux.append(row[columns_travaux[i]])
+
+            cursor.execute(query_travaux, tuple(tab_travaux))
+
+            id_travaux = cursor.lastrowid
+
+            for i in range(len(columns_type)):
+                if isinstance(row[columns_type[i]], str):
+                    row[columns_type[i]] = row[columns_type[i]].replace("'", "''")
+                tab_type.append(row[columns_type[i]])
+
+
+            tab_type.insert(0, id_travaux)
+
+
+            cursor.execute(query_type, tuple(tab_type))
+
+        except IntegrityError as err:
+            print(err)
