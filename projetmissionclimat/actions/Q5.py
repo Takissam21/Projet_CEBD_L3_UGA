@@ -55,7 +55,7 @@ class Window(tk.Toplevel):
                    min(M.temperature_min_mesure) AS minimum,
                    max(M.temperature_max_mesure) AS maximum
             FROM Departements D
-            INNER JOIN Mesures M 
+            JOIN Mesures M 
                 ON D.code_departement = M.code_departement
             WHERE M.date_mesure 
             GROUP BY D.code_departement, annee
