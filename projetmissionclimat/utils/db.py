@@ -112,7 +112,7 @@ def insertDB():
             "data/csv/Isolation.csv", ';',
             "insert into Travaux (cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, type_logement_travaux, annee_construction_logement_travaux, code_region,code_departement) values (?, ?, ?, ?, ?, ?,?)",
             "insert into Isolations values (?, ?, ?, ?, ?)",
-            ['cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement', 'annee_construction', 'code_region','code_departement'],
+            ['cout_total_ht', 'cout_induit_ht', 'annee_travaux', 'type_logement', 'annee_construction', 'code_region','code_departement'],
             ['poste_isolation', 'isolant', 'epaisseur', 'surface']
         )
 
@@ -121,16 +121,16 @@ def insertDB():
             "data/csv/Chauffage.csv", ';',
             "insert into Travaux (cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, type_logement_travaux, annee_construction_logement_travaux, code_region,code_departement) values (?, ?, ?, ?, ?, ?,?)",
             "insert into Chauffages values (?, ?, ?, ?, ?)",
-            ['cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement', 'annee_construction', 'code_region','code_departement'],
+            ['cout_total_ht', 'cout_induit_ht', 'annee_travaux', 'type_logement', 'annee_construction', 'code_region','code_departement'],
             ['energie_chauffage_avt_travaux', 'energie_chauffage_installee', 'generateur', 'type_chaudiere']
         )
 
         # On ajoute les travaux de panneaux photovolatiques dans les tables Travaux et Photovoltaiques
         read_csv_file_travaux(
             "data/csv/Photovoltaique.csv", ';',
-            "insert into Travaux (cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, type_logement_travaux, annee_construction_logement_travaux, code_region,code_departement) values (?, ?, ?, ?, ?, ?,?)",
+            "insert into Travaux (cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, type_logement_travaux, annee_construction_logement_travaux, code_region) values (?, ?, ?, ?, ?, ?)",
             "insert into Photovoltaiques values (?, ?, ?)",
-            ['cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement', 'annee_construction', 'code_region','code_departement'],
+            ['cout_total_ht', 'cout_induit_ht', 'annee_travaux', 'type_logement', 'annee_construction', 'code_region'],
             ['puissance_installee', 'type_panneaux']
         )
 
