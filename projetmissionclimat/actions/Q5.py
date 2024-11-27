@@ -50,16 +50,17 @@ class Window(tk.Toplevel):
         nbquery = 0
         # 1. Requête
         query = """
-              SELECT D.code_departement, D.nom_departement, 
-                     strftime('%Y', M.date_mesure) AS annee,
-                     ROUND(AVG(M.temperature_moy_mesure), 2) AS moyenne,
-                     MIN(M.temperature_min_mesure) AS minimum,
-                     MAX(M.temperature_max_mesure) AS maximum
-              FROM Departements D
-              LEFT JOIN Mesures M ON D.code_departement = M.code_departement
-              GROUP BY D.code_departement, annee
-              ORDER BY D.code_departement, annee
-          """
+            SELECT D.code_departement, D.nom_departement, strftime('%Y', M.date_mesure) as annee,
+                   ROUND(avg(M.temperature_moy_mesure), 2) AS moyenne,
+                   min(M.temperature_min_mesure) AS minimum,
+                   max(M.temperature_max_mesure) AS maximum
+            FROM Departements D
+            INNER JOIN Mesures M 
+                ON D.code_departement = M.code_departement
+            WHERE M.date_mesure 
+            GROUP BY D.code_departement, annee
+            ORDER BY D.code_departement, annee;
+        """
         try:
             cursor = db.data.cursor()
             result = cursor.execute(query)
